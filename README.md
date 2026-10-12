@@ -1,34 +1,62 @@
-Content warning: the mod is pretty much entirely vibe-coded with Claude and Universal Modder, but had extensive playtesting, so hopefully no bugs were missed.
-
 # FaceCam
 
-A small streamer camera in the corner that tracks whatever is currently trying to kill you and is the closest. Tracks the mass, faces, hunter, the rat king and the remains. Priority by distance. 
-The sneaky bastards in the endless abyss sniped me one too many times, and I just wanted to know where they are at without turning around.
+A [White Knuckle](https://store.steampowered.com/app/3195790/White_Knuckle/) mod: a small streamer camera in the
+corner of the screen that tracks whatever is closest and trying to kill you. That's the Mass, Faces, the Hunter, the
+Rat King or Remains.
 
-![FaceCam tracking a Face in the Endless Abyss](https://raw.githubusercontent.com/loweffortslop/wk_facecam/main/docs/screenshots/face.jpg)
-![FaceCam tracking the Hunter](https://raw.githubusercontent.com/loweffortslop/wk_facecam/main/docs/screenshots/hunter.jpg)
-![FaceCam tracking Remains](https://raw.githubusercontent.com/loweffortslop/wk_facecam/main/docs/screenshots/remains.jpg)
+**Download it from Thunderstore:** https://thunderstore.io/c/white-knuckle/p/SlopGaming/FaceCam/
 
-Configurable, comes with the following settings
+![FaceCam tracking a Face in the Endless Abyss](docs/screenshots/face.jpg)
+![FaceCam tracking the Hunter](docs/screenshots/hunter.jpg)
 
-| Section | Setting | Default | What it does |
-|---|---|---|---|
-| General | ToggleKey | F7 | Turns the feed on or off |
-| General | EnabledOnStart | false | Whether the feed is on when the game launches |
-| General | HideWhenNoThreat | true | Hides the feed when nothing is being tracked |
-| General | MaxTrackDistance | 250 | Ignores threats further away than this (metres) |
-| Threats | TrackMass / TrackFaces / TrackHunter / TrackRemains / TrackRatKing | true | Picks which threats are tracked |
-| Viewport | Corner | BottomRight | Which corner the feed sits in |
-| Viewport | Size | 0.28 | Side length of the square feed, as a fraction of screen height |
-| Viewport | Margin, BorderThickness, BorderColor | 24, 3, light grey | Layout and style (pixels) |
-| Viewport | ShowName | true | Shows the name tag |
-| Viewport | ShowDistance | false | Adds the distance to the name tag |
-| Camera | FieldOfView | 60 | Field of view of the feed |
-| Camera | AimSmoothing | 10 | How fast the camera turns (0 = instant) |
-| Camera | ResolutionScale | 1 | Set to 2–4 to render the feed at lower resolution for more FPS |
-| Shake | ShakeDistance | 10 | The shake starts below this distance (0 turns shake off) |
-| Shake | ShakeAngle, ShakePixels, ShakeSpeed | 1.2, 4, 18 | How strong and fast the shake is |
+What it does and every setting are in the [Thunderstore README](thunderstore/README.md).
 
+## Building
 
-Possible untested mod conflicts:
--Remains had to be tweaked to allow for the mod camera to look at them, so this may cause issues with the multiplayer mod
+You need the .NET SDK (6 or newer), White Knuckle, and a Thunderstore Mod Manager (or r2modman) profile with
+BepInEx installed.
+
+1. Point the build at your files. Either edit the paths at the top of `FaceCam.csproj`, or pass them on the command
+   line:
+
+   ```
+   dotnet build -c Release -p:GameDir="C:\Program Files (x86)\Steam\steamapps\common\White Knuckle" -p:BepInExDir="%APPDATA%\Thunderstore Mod Manager\DataFolder\WhiteKnuckle\profiles\Default\BepInEx"
+   ```
+
+   `GameDir` is used for the game's assemblies, `BepInExDir` for BepInEx and Harmony.
+2. Build:
+
+   ```
+   dotnet build -c Release
+   ```
+
+   Add `-p:Deploy=true` to copy the plugin into that profile for testing. Don't do that while the Thunderstore
+   release is installed there: they share a folder.
+3. Make the Thunderstore zip:
+
+   ```
+   ./pack.ps1
+   ```
+
+   It builds and writes `dist/SlopGaming-FaceCam-<version>.zip`. The version comes from
+   `thunderstore/manifest.json`.
+
+## Layout
+
+| Path | What |
+|---|---|
+| `src/` | The plugin. `FaceCamPlugin.cs` finds threats, aims the camera and draws the feed; `RemainsVisibilityPatch.cs` keeps Remains from freezing while the feed looks at them. |
+| `thunderstore/` | Thunderstore manifest, README, changelog and icon. |
+| `docs/` | Screenshots and notes. |
+| `pack.ps1` | Builds and packages the Thunderstore zip. |
+
+## Credits
+- White Knuckle by Dark Machine Games.
+- [BepInEx](https://github.com/BepInEx/BepInEx) and [Harmony](https://github.com/pardeike/Harmony).
+- Code written with Claude Code (Anthropic's Claude) and Universal Modder. No AI-generated art or audio.
+
+Not affiliated with Dark Machine Games. This repository contains no game code or assets; building it needs your own
+copy of White Knuckle.
+
+## License
+[MIT](LICENSE)
