@@ -11,6 +11,9 @@ if ($manifest.description -match 'TODO') { $problems += 'manifest.json descripti
 if ($manifest.description.Length -gt 250) { $problems += "manifest.json description is $($manifest.description.Length) characters (max 250)" }
 if ($problems) { $problems | ForEach-Object { Write-Host "Not packaging: $_" -ForegroundColor Red }; exit 1 }
 
+# thunderstore\README.md is the one to edit; the repo root copy is what GitHub shows.
+Copy-Item "$ts\README.md" "$root\README.md" -Force
+
 dotnet build "$root\FaceCam.csproj" -c Release
 if ($LASTEXITCODE -ne 0) { throw 'Build failed' }
 

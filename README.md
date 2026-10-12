@@ -28,3 +28,7 @@ Configurable, comes with the following settings
 | Camera | ResolutionScale | 1 | Set to 2–4 to render the feed at lower resolution for more FPS |
 | Shake | ShakeDistance | 10 | The shake starts below this distance (0 turns shake off) |
 | Shake | ShakeAngle, ShakePixels, ShakeSpeed | 1.2, 4, 18 | How strong and fast the shake is |
+
+
+Possible untested mod conflicts:
+-Remains had to be tweaked to allow for the mod camera to look at them, so this may cause issues with the multiplayer mod
