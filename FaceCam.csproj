@@ -35,8 +35,9 @@
     <Reference Include="UnityEngine.TextRenderingModule" HintPath="$(ManagedDir)\UnityEngine.TextRenderingModule.dll" Private="false" />
   </ItemGroup>
 
-  <!-- Copy the built plugin into the Thunderstore profile for testing. -->
-  <Target Name="DeployToProfile" AfterTargets="Build" Condition="Exists('$(BepInExDir)\plugins')">
+  <!-- Opt-in: `dotnet build -p:Deploy=true` copies the plugin into the Thunderstore profile for testing.
+       Don't use it while the Thunderstore release is installed: it writes into the same folder. -->
+  <Target Name="DeployToProfile" AfterTargets="Build" Condition="'$(Deploy)' == 'true' And Exists('$(BepInExDir)\plugins')">
     <MakeDir Directories="$(BepInExDir)\plugins\SlopGaming-FaceCam" />
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(BepInExDir)\plugins\SlopGaming-FaceCam" />
   </Target>
