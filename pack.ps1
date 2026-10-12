@@ -25,6 +25,14 @@ Copy-Item "$root\bin\Release\FaceCam.dll" "$stage\plugins"
 
 $zip = Join-Path $root "dist\SlopGaming-FaceCam-$version.zip"
 if (Test-Path $zip) { Remove-Item $zip }
-Compress-Archive -Path "$stage\*" -DestinationPath $zip
+# Not Compress-Archive: on Windows PowerShell 5.1 it stores entries with backslashes (plugins\FaceCam.dll).
+Add-Type -AssemblyName System.IO.Compression, System.IO.Compression.FileSystem
+$archive = [IO.Compression.ZipFile]::Open($zip, 'Create')
+try {
+    Get-ChildItem $stage -Recurse -File | ForEach-Object {
+        $entry = $_.FullName.Substring($stage.Length + 1).Replace('\', '/')
+        [IO.Compression.ZipFileExtensions]::CreateEntryFromFile($archive, $_.FullName, $entry) | Out-Null
+    }
+} finally { $archive.Dispose() }
 Remove-Item $stage -Recurse -Force
 Write-Host "Packaged $zip"
