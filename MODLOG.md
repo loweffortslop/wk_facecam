@@ -20,6 +20,9 @@
 - Subtitle font: `CL_UIManager.instance.subtitleObject.text` (a TMP_Text) gives `.font` and `.fontSharedMaterial`.
 - End of run: `CL_GameManager.runHasEnded` (public static), `dead` (private static) and `loading` (private instance) are read by reflection. Pause: `CL_GameManager.gMan.isPaused`.
 - Sky gotcha: the skybox writes alpha 0 into an RGBA render texture. IMGUI `DrawTexture(alphaBlend:false)` hid this (1.0), but a uGUI RawImage alpha-blends, so the sky turned see-through and showed the grey border panel behind it as "fog" (1.2). Fix: an RT format with no alpha (RGB111110Float, RGB565 fallback). A plain `CopyFrom` camera looks right. Cloning the player camera (1.3.0) was a misdiagnosis and has been removed.
+- Remains (1.3.2): `DEN_Remains_Active.Update` freezes when `meshRenderer.isVisible` is true, and that counts every camera. A transpiler swaps the call for a helper: isVisible AND inside the player camera's frustum, but only while FaceCam is rendering.
+- Name-tag font: `CL_UIManager.subtitleObject.text.font` is NOT the font shown in game; copy it from a live `UI_Subtitle` under `subtitleParent` instead.
+- Build: target netstandard2.1. On net472, GeometryUtility pulls in netstandard 2.1 (CS1705). With netstandard2.1, Harmony's `CodeInstruction.labels` (`Label` from mscorlib) won't resolve (CS7069), so edit instructions in place.
 - Hardcoded game keys: F1, F4, F5, F12, Shift+F12, Ctrl+;, so the mod uses F7.
 
 ## Build / package

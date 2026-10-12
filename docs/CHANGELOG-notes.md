@@ -2,6 +2,11 @@
 
 # Changelog
 
+## 1.3.2
+- Remains move again while they're on FaceCam. They check `Renderer.isVisible`, which counts every camera; a Harmony transpiler now makes that check only count the player's own view while FaceCam is drawing.
+- The name tag takes its font from a subtitle line that's actually on screen, because the subtitle template's font isn't the one players see. The font name is logged.
+- The project now targets netstandard2.1 (needed for Unity's frustum API).
+
 ## 1.3.1
 - Fixed the sky showing as flat fog in the feed (broken since 1.2.0). The sky renders with zero alpha, which made it see-through on the HUD. The feed is now always opaque.
 - Back to the plain camera setup from 1.0–1.1. The camera cloning added in 1.3.0 is removed.

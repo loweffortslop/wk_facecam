@@ -5,6 +5,10 @@ Content warning: the mod is pretty much entirely vibe-coded with Claude and Univ
 A small streamer camera in the corner that tracks whatever is currently trying to kill you and is the closest. Tracks the mass, faces, hunter, the rat king and the remains. Priority by distance. 
 The sneaky bastards in the endless abyss sniped me one too many times, and I just wanted to know where they are at without turning around.
 
+![FaceCam tracking a Face in the Endless Abyss](https://raw.githubusercontent.com/loweffortslop/wk_facecam/main/docs/screenshots/face.jpg)
+![FaceCam tracking the Hunter](https://raw.githubusercontent.com/loweffortslop/wk_facecam/main/docs/screenshots/hunter.jpg)
+![FaceCam tracking Remains](https://raw.githubusercontent.com/loweffortslop/wk_facecam/main/docs/screenshots/remains.jpg)
+
 Configurable, comes with the following settings
 
 | Section | Setting | Default | What it does |

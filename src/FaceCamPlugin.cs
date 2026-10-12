@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.Reflection;
 using BepInEx;
 using BepInEx.Configuration;
+using BepInEx.Logging;
+using HarmonyLib;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,7 +15,7 @@ namespace FaceCam
     {
         public const string PluginGuid = "com.slopgaming.facecam";
         public const string PluginName = "FaceCam";
-        public const string PluginVersion = "1.3.1";
+        public const string PluginVersion = "1.3.2";
 
         public enum Corner { TopLeft, TopRight, BottomLeft, BottomRight }
 
@@ -116,8 +118,17 @@ namespace FaceCam
             shakeSpeed = Config.Bind("Shake", "ShakeSpeed", 18f, "Shake frequency.");
 
             active = enabledOnStart.Value;
+            Log = Logger;
+            instance = this;
+            new Harmony(PluginGuid).PatchAll(typeof(RemainsVisibilityPatch));
             Logger.LogInfo($"{PluginName} {PluginVersion} loaded. Toggle with {toggleKey.Value}. Starts {(active ? "on" : "off")}.");
         }
+
+        internal static ManualLogSource Log;
+        private static FaceCamPlugin instance;
+
+        // True while the FaceCam camera is drawing, so its renders count towards Renderer.isVisible.
+        internal static bool Rendering => instance != null && instance.cam != null && instance.cam.enabled;
 
         private void Update()
         {
@@ -420,26 +431,48 @@ namespace FaceCam
             tagText.color = Color.white;
             Stretch(tagText.rectTransform, 0f);
             ApplySubtitleFont(tagText);
+            liveFontApplied = false;
 
             Logger.LogInfo($"FaceCam HUD attached to canvas '{hudCanvas.name}' at index {siblingIndex} (before '{branch.name}').");
             return true;
         }
 
+        // The subtitle template's font isn't the one players see, so prefer a live subtitle line once one appears.
         private void ApplySubtitleFont(TextMeshProUGUI text)
         {
             CL_UIManager ui = CL_UIManager.instance;
             TMP_Text subtitle = ui != null && ui.subtitleObject != null ? ui.subtitleObject.text : null;
-            if (subtitle != null && subtitle.font != null)
+            if (subtitle != null && subtitle.font != null) CopyFont(subtitle, text, "subtitle template");
+            else Logger.LogWarning("Subtitle font not found; the name tag uses the default TMP font.");
+        }
+
+        private float nextLiveFontCheck;
+
+        private void TryApplyLiveSubtitleFont()
+        {
+            if (liveFontApplied || Time.unscaledTime < nextLiveFontCheck) return;
+            nextLiveFontCheck = Time.unscaledTime + 1f;
+
+            CL_UIManager ui = CL_UIManager.instance;
+            if (ui == null || ui.subtitleParent == null) return;
+            foreach (UI_Subtitle line in ui.subtitleParent.GetComponentsInChildren<UI_Subtitle>(false))
             {
-                text.font = subtitle.font;
-                text.fontSharedMaterial = subtitle.fontSharedMaterial;
-                text.fontStyle = subtitle.fontStyle;
-                text.characterSpacing = subtitle.characterSpacing;
+                if (line.text == null || line.text.font == null || string.IsNullOrEmpty(line.text.text)) continue;
+                CopyFont(line.text, tagText, "live subtitle");
+                liveFontApplied = true;
+                return;
             }
-            else
-            {
-                Logger.LogWarning("Subtitle font not found; the name tag uses the default TMP font.");
-            }
+        }
+
+        private bool liveFontApplied;
+
+        private void CopyFont(TMP_Text from, TMP_Text to, string source)
+        {
+            to.font = from.font;
+            to.fontSharedMaterial = from.fontSharedMaterial;
+            to.fontStyle = from.fontStyle;
+            to.characterSpacing = from.characterSpacing;
+            Logger.LogInfo($"Name tag font from {source}: '{from.font.name}', material '{from.fontSharedMaterial?.name}'.");
         }
 
         private static T NewChild<T>(string name, Transform parent) where T : Component
@@ -486,6 +519,7 @@ namespace FaceCam
 
         private void UpdateTag()
         {
+            TryApplyLiveSubtitleFont();
             bool show = (showName.Value || showDistance.Value) && hasThreat;
             tagRoot.gameObject.SetActive(show);
             if (!show) return;
