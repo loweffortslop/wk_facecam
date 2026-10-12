@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <AssemblyName>FaceCam</AssemblyName>
+    <RootNamespace>FaceCam</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <Version>1.3.1</Version>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <DebugType>none</DebugType>
+
+    <GameDir Condition="'$(GameDir)' == ''">S:\Steam\steamapps\common\White Knuckle</GameDir>
+    <ManagedDir>$(GameDir)\White Knuckle_Data\Managed</ManagedDir>
+    <BepInExDir Condition="'$(BepInExDir)' == ''">$(APPDATA)\Thunderstore Mod Manager\DataFolder\WhiteKnuckle\profiles\Default\BepInEx</BepInExDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net472" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="BepInEx" HintPath="$(BepInExDir)\core\BepInEx.dll" Private="false" />
+    <Reference Include="Assembly-CSharp" HintPath="$(ManagedDir)\Assembly-CSharp.dll" Private="false" />
+    <Reference Include="ALINE" HintPath="$(ManagedDir)\ALINE.dll" Private="false" />
+    <Reference Include="UnityEngine" HintPath="$(ManagedDir)\UnityEngine.dll" Private="false" />
+    <Reference Include="UnityEngine.CoreModule" HintPath="$(ManagedDir)\UnityEngine.CoreModule.dll" Private="false" />
+    <Reference Include="UnityEngine.IMGUIModule" HintPath="$(ManagedDir)\UnityEngine.IMGUIModule.dll" Private="false" />
+    <Reference Include="UnityEngine.InputLegacyModule" HintPath="$(ManagedDir)\UnityEngine.InputLegacyModule.dll" Private="false" />
+    <Reference Include="UnityEngine.PhysicsModule" HintPath="$(ManagedDir)\UnityEngine.PhysicsModule.dll" Private="false" />
+    <Reference Include="UnityEngine.UI" HintPath="$(ManagedDir)\UnityEngine.UI.dll" Private="false" />
+    <Reference Include="UnityEngine.UIModule" HintPath="$(ManagedDir)\UnityEngine.UIModule.dll" Private="false" />
+    <Reference Include="Unity.TextMeshPro" HintPath="$(ManagedDir)\Unity.TextMeshPro.dll" Private="false" />
+    <Reference Include="UnityEngine.TextRenderingModule" HintPath="$(ManagedDir)\UnityEngine.TextRenderingModule.dll" Private="false" />
+  </ItemGroup>
+
+  <!-- Copy the built plugin into the Thunderstore profile for testing. -->
+  <Target Name="DeployToProfile" AfterTargets="Build" Condition="Exists('$(BepInExDir)\plugins')">
+    <MakeDir Directories="$(BepInExDir)\plugins\SlopGaming-FaceCam" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(BepInExDir)\plugins\SlopGaming-FaceCam" />
+  </Target>
+
+</Project>
